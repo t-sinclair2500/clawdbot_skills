@@ -5,7 +5,7 @@ A collection of Clawdbot skills for extending agent capabilities.
 ## Skills
 
 ### [lmstudio-subagents](./lmstudio-subagents/)
-Equips agents to search for and offload tasks to local models in LM Studio. Use when offloading simple tasks to free local models, saving paid API tokens, or requiring local-only processing for privacy.
+Reduces token usage from paid providers by offloading work to local LM Studio models. Use when cutting costs with local models (summarization, extraction, classification, etc.), avoiding paid API calls for high-volume work, or when no extra model configuration is desired (load/unload or JIT via REST API).
 
 ### [ralph-wiggum](./ralph-wiggum/)
 Iterative self-improving development loops using worker/monitor subagents. Use when tasks require multiple iterations, self-correction, or refinement until completion criteria are met.

@@ -4,8 +4,11 @@ A Clawdbot skill that equips agents to search for and offload tasks to local mod
 
 ## Features
 
-- **Model discovery** - Lists and selects from models available in LM Studio
+- **REST-only (no CLI)** - Uses LM Studio v1 REST API only; no `lms` on PATH required
+- **Model discovery** - Lists and selects from models via GET /api/v1/models
 - **Task offloading** - Routes appropriate tasks to local models to save paid API tokens
+- **Stateful multi-turn** - Optional response_id / previous_response_id for conversation context
+- **JIT loading** - No explicit load required; first chat request loads the model (stats.model_load_time_seconds)
 - **No configuration required** - Works with models in LM Studio without Clawdbot config setup
 - **Local processing** - All processing happens locally for privacy
 - **Model selection** - Supports LLMs, VLMs, and embedding models based on task needs
@@ -24,12 +27,12 @@ clawdhub install lmstudio-subagents
 1. Clone this repository or download the skill folder
 2. Place the `lmstudio-subagents` folder in your Clawdbot skills directory:
    - Workspace: `<workspace>/skills/lmstudio-subagents/`
-   - Global: `~/.clawdbot/skills/lmstudio-subagents/`
+   - Global: `~/.openclaw/skills/lmstudio-subagents/`
 
 ## Prerequisites
 
-- LM Studio installed with `lms` CLI available on PATH
-- LM Studio server running (default: http://127.0.0.1:1234)
+- LM Studio 0.4+ with server running (default: http://127.0.0.1:1234)
+- No CLI required
 - Models downloaded in LM Studio
 
 ## Usage
@@ -44,19 +47,16 @@ Example: "Use lmstudio-subagents to summarize this document"
 
 ## How It Works
 
-1. Lists available models via `lms ls`
-2. Checks currently loaded models via `lms ps`
-3. Selects appropriate model based on task requirements
-4. Loads model if not already loaded
-5. Calls LM Studio API directly with the selected model
-6. Returns results and optionally unloads model
+1. Lists available models via GET /api/v1/models
+2. Optionally checks loaded_instances or POST /api/v1/models/load for specific options
+3. Selects model by key and capabilities (vision, embedding, context)
+4. Calls POST /api/v1/chat (JIT loads model if needed)
+5. Parses output and optional response_id for stateful follow-up
+6. Optionally POST /api/v1/models/unload with instance_id
 
 ## Performance
 
-Tested with LM Studio 0.3.39, meta-llama-3.1-8b-instruct (Q4_K_M):
-- Model load time: ~1.15s (p50)
-- API call latency: ~0.17s (p50), varies with generation length
-- Model unload time: ~0.11s
+Tested with LM Studio 0.4.x. JIT first-request load time in response stats.model_load_time_seconds. API call latency varies with generation length.
 
 ## License
 
